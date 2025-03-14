@@ -1,0 +1,17 @@
+
+
+-- Run on CFRE 
+-- This runs the sp 'FindInFormSp'
+-- The sp checks Forms, formcomponents, FormEventHandlers, FilterPropertyAttributes, ScriptLines, FilterPropertyAttributes, Variables
+-- This checks for the param identifier wildcard
+
+set nocount on
+DECLARE @return_value int
+
+EXEC @return_value = [dbo].[FindInFormSp]
+  @Identifier = '%ChgPoLineRelStatSp%',
+  @FormName = NULL
+
+SELECT 'Return Value' = @return_value
+
+GO

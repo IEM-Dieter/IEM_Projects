@@ -1,0 +1,6 @@
+USE ReportServer;
+SELECT TOP 20 
+*
+FROM ExecutionLogStorage
+WHERE Parameters LIKE '%Inv%' AND TimeStart >= '2025-01-23'
+ORDER BY TimeStart DESC;
