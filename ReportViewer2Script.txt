@@ -95,7 +95,8 @@ VALUES
 ('PurchaseOrderStatusReportViewer2', '_IEM_Purchasing_ReadOnly', 329),
 ('ReprintTransferShipPackingSlipReportViewer2', '_IEM_Shipping-Receiving', 288),
 ('VoucherRegisterReportViewer2', '_IEM_Accounts_Payable', 276),
-('VoucherRegisterReportViewer2', '_IEM_Accounting_Management', 301)
+('VoucherRegisterReportViewer2', '_IEM_Accounting_Management', 301),
+('lc_ClickOnce_Files', '_IEM_Core', 280)
 
 -- Add additional Report Viewers as Needed
 
