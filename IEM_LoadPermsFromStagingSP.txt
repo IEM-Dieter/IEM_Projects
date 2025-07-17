@@ -1,0 +1,82 @@
+USE [FRE_App];
+GO
+
+SET ANSI_NULLS ON;
+GO
+SET QUOTED_IDENTIFIER ON;
+GO
+
+ALTER PROCEDURE [dbo].[_IEM_LoadPermsFromStaging]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    DECLARE @InsertedRows INT = 0;
+
+    IF EXISTS (SELECT 1 FROM iemCommon.dbo._IEM_StagedGroupAuthorization)
+    BEGIN
+        BEGIN TRY
+            BEGIN TRANSACTION;
+
+            INSERT INTO FRE_App.dbo.AccountAuthorizations_mst (
+                SiteRef,
+                ObjectName1,
+                ObjectType,
+                ObjectName2,
+                UserFlag,
+                Id, -- This is GroupID
+                ReadPrivilege,
+                UpdatePrivilege,
+                BulkUpdatePrivilege,
+                InsertPrivilege,
+                DeletePrivilege,
+                EditPrivilege,
+                ExecutePrivilege
+            )
+            SELECT
+                s.SiteRef,
+                s.ObjectName1,
+                s.ObjectType,
+                s.ObjectName2,
+                s.UserFlag,
+                s.GroupID,
+                s.ReadPrivilege,
+                s.UpdatePrivilege,
+                s.BulkUpdatePrivilege,
+                s.InsertPrivilege,
+                s.DeletePrivilege,
+                s.EditPrivilege,
+                s.ExecutePrivilege
+            FROM iemCommon.dbo._IEM_StagedGroupAuthorization s
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM FRE_App.dbo.AccountAuthorizations_mst t
+                WHERE 
+                    t.Id = s.GroupID AND
+                    LTRIM(RTRIM(t.ObjectName1)) = LTRIM(RTRIM(s.ObjectName1)) AND
+                    LTRIM(RTRIM(t.ObjectName2)) = LTRIM(RTRIM(s.ObjectName2))
+            );
+
+            -- Count how many rows were inserted
+            SET @InsertedRows = @@ROWCOUNT;
+
+            -- Clean up the staging table
+            TRUNCATE TABLE iemCommon.dbo._IEM_StagedGroupAuthorization;
+
+            COMMIT TRANSACTION;
+
+            -- Clear result and show final summary in Results tab
+            SELECT 
+                'Authorization load completed successfully.' AS Message,
+                @InsertedRows AS RowsInserted;
+        END TRY
+        BEGIN CATCH
+            ROLLBACK TRANSACTION;
+            PRINT 'Error occurred: ' + ERROR_MESSAGE();
+        END CATCH
+    END
+    ELSE
+    BEGIN
+        PRINT 'No rows found in staging table.';
+    END
+END;

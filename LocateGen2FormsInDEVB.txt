@@ -1,0 +1,12 @@
+SELECT SiteRef, Groupnames.Groupname, ObjectName1, ObjectType, ObjectName2, UserFlag, Id, ReadPrivilege, UpdatePrivilege, BulkUpdatePrivilege, InsertPrivilege, DeletePrivilege, EditPrivilege, ExecutePrivilege
+FROM AccountAuthorizations_mst
+JOIN GroupNames ON AccountAuthorizations_mst.id = GroupNames.GroupId
+WHERE ObjectName1 LIKE '%gen2%' AND 
+Groupnames.GroupName LIKE '_IEM%' AND
+Groupnames.Groupname != '_IEM_Gen2'
+ORDER BY Groupnames.Groupname ASC
+
+
+SELECT * FROM GroupNames
+WHERE Groupname LIKE '_IEM_%'
+
