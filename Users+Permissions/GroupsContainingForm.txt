@@ -3,4 +3,11 @@
 SELECT GroupName, GroupDesc, AccountAuthorizations_mst.ObjectName1 AS [Form], DeletePrivilege, EditPrivilege, ExecutePrivilege, InsertPrivilege, ReadPrivilege, UpdatePrivilege, BulkUpdatePrivilege, Uf_NotePrivilege, AccountAuthorizations_mst.UpdatedBy, AccountAuthorizations_mst.RecordDate
 FROM AccountAuthorizations_mst
 JOIN GroupNames ON AccountAuthorizations_mst.id = GroupNames.GroupId
-WHERE AccountAuthorizations_mst.ObjectName1 = 'PurchaseOrderListing' AND ExecutePrivilege = 1
+WHERE GroupName LIKE '%IEM%'
+AND (AccountAuthorizations_mst.ObjectName1 = 'PlanningDetailFirmPO' OR AccountAuthorizations_mst.ObjectName1 = 'PlanningDetailFirmPO' OR AccountAuthorizations_mst.ObjectName1 = 'PlanningDetailFirmTO')
+
+
+C:\Users\dieter.noesner\AppData\Local\ms-playwright
+
+
+\\192.168.3.3\attachment\DocTrak\Invoices\

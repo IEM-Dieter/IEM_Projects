@@ -1,0 +1,14 @@
+Use FRE_App
+ 
+select * from [dbo].[_IEM_BomUpdateLog] where syncError like '%dead%' and createdate >= '2025-09-1 00:00:00'
+order by createdate desc
+ 
+Use JAX_App
+ 
+select * from [dbo].[_IEM_BomUpdateLog] where syncError like '%dead%' and createdate >= '2025-09-1 00:00:00'
+order by createdate desc
+ 
+Use VAN_App
+ 
+select * from [dbo].[_IEM_BomUpdateLog] where syncError like '%dead%' and createdate >= '2025-09-1 00:00:00'
+order by createdate desc

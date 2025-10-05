@@ -1,0 +1,20 @@
+-- Query to find users who havent been active in the last 90 days.  The query looks for users in Active (0) and Locked Out (1) status.
+
+--Create the global temp table to store the users.
+-- Query the users to find those inactive and insert them into the table.
+
+USE ZFRE_App
+
+SELECT * INTO ##_IEM_inactiveusers
+FROM (
+	SELECT Username, EditLevel, SuperUserFlag, UserDesc, Status, LastActiveDate FROM UserNames
+	WHERE LastActiveDate < GETDATE() - 90 AND Username = 'buyer'
+	) AS InactiveUsers
+
+SELECT * FROM ##_IEM_inactiveusers; -- Just to confirm the records are in the temp table.
+
+--Clause to update the status of the users listed in the temp table.
+
+UPDATE Usernames
+SET Status = 0
+WHERE tempdb.##_IEM_inactiveusers.Username = ZFRE_App.Usernames.Username ??

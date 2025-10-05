@@ -1,0 +1,10 @@
+Use JAX_App
+--Query and Delete from Active Background Tasks
+ 
+--select * from activebgtasks_mst
+--delete from activebgtasks_mst where requestinguser = 'rick.fulton'
+
+
+
+
+

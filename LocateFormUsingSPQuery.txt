@@ -1,0 +1,12 @@
+-- For finding forms using SP's -- 
+
+set nocount on
+DECLARE @return_value int
+
+EXEC @return_value = [dbo].[FindInFormSp]
+  @Identifier = '%_IEM_CLM_ItemCountByDaySp%',
+  @FormName = NULL
+
+SELECT 'Return Value' = @return_value
+
+GO

@@ -1,0 +1,84 @@
+-- 1. Create an audit log table (run once to create)
+IF NOT EXISTS (
+    SELECT 1 FROM iemCommon.sys.tables WHERE name = '_IEM_UserStatusChangeLog'
+)
+BEGIN
+    EXEC iemCommon.sys.sp_executesql N'
+        CREATE TABLE iemCommon.dbo._IEM_UserStatusChangeLog (
+            LogID INT IDENTITY(1,1) PRIMARY KEY,
+            Username VARCHAR(255),
+            PreviousStatus VARCHAR(50),
+            NewStatus VARCHAR(50),
+            LastActiveDate DATETIME,
+            ChangeReason VARCHAR(255),
+            ChangeDate DATETIME DEFAULT GETDATE()
+        );';
+END;
+
+-- 2. Switch to FRE_App for User Analysis
+
+USE FRE_App
+GO
+
+DECLARE @ExemptUserList TABLE(username varchar(MAX));
+
+-- 2. Decalre and Populate Exempt List (MSA, dev accounts, etc.)
+
+INSERT INTO @ExemptUserList (username)
+VALUES 
+    ('SL_Internal'),
+    ('service'),
+    ('sa'),
+    ('infor.system'),
+    ('FTAutomation'),
+    ('nutech.viewpoint'),
+	('syteline.developer'),
+	('mulesoft.sfdc.prd'),
+	('DTFLEXUser'),
+	('UKGAutomation');
+
+-- 3. Clean up the temp table if it still exists
+
+IF OBJECT_ID('tempdb..#UsersToEditStatus') IS NOT NULL DROP TABLE #UsersToEditStatus;
+
+-- 4. Select Users to Disable
+
+SELECT 
+    username,
+    CurrentStatus = 
+        CASE 
+            WHEN Status = '0' THEN 'Enabled'
+            WHEN Status = '1' THEN 'Locked Out'
+            WHEN Status = '2' THEN 'Disabled'
+        END,
+    LastActiveDate
+INTO #UsersToEditStatus
+FROM UserNames un
+WHERE 
+    un.username NOT IN (SELECT username FROM @ExemptUserList)
+    AND SuperUserFlag != '1'
+    AND Status != '2'
+    AND LastActiveDate < DATEADD(DAY, -90, GETDATE())
+;
+
+-- 5. Preview the users who will be disabled
+
+SELECT * FROM #UsersToEditStatus;
+
+-- 6. Log the Users to be Disabled to iemCommon
+
+INSERT INTO iemCommon._IEM_UserStatusChangeLog (Username, PreviousStatus, NewStatus, LastActiveDate, ChangeReason)
+SELECT 
+    Username,
+    CurrentStatus,
+    'Disabled',
+    LastActiveDate,
+    'Auto-disabled due to inactivity > 90 days'
+FROM #UsersToEditStatus;
+
+-- 7. Update their status to Disabled
+
+UPDATE un
+SET Status = '2'
+FROM UserNames un
+INNER JOIN #UsersToEditStatus ue ON un.username = ue.username;

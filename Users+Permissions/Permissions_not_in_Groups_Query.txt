@@ -1,0 +1,49 @@
+
+select Auth.SiteRef, Users.Username, Users.UserDesc, 
+
+ 'UserStatus'=
+   CASE 
+     WHEN Users.[Status] = 0 THEN 'Active'
+     WHEN Users.[Status] = 1 THEN 'Locked Out'
+     WHEN Users.[Status] = 2 THEN 'Disabled'
+   END,
+
+ Auth.[ObjectName1] as [Form Name], ObjectType, ObjectName2 as SubName,  
+  case when Auth.[DeletePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Delete],
+       
+  case when Auth.[EditPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Edit],
+  
+  case when Auth.[ExecutePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Execute],
+
+  case when Auth.[InsertPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Insert],
+
+  case when Auth.[ReadPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Read],
+
+  case when Auth.[UpdatePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Update],
+
+  case when Auth.[BulkUpdatePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Bulk_Update], 
+  Auth.CreatedBy, Auth.UpdatedBy, Auth.CreateDate
+
+from AccountAuthorizations_mst Auth left join usernames Users on Auth.Id = Users.UserId
+Where Auth.UserFlag = 1

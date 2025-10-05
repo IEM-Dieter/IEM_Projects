@@ -1,0 +1,39 @@
+
+-- This query dumps ALL users from the system including "Active", temporarily "Locked Out" and "Disabled" users
+-- The "Username" Database is global and is only available in the "Master Site"
+-- Edit Permissions per user in this context are for FORM control - Not Record manipulation.
+-- A user with EditPerms of "None" cannot even save the the column size from results in a form.
+-- A user with EditPerms of "Basic" can modify how data in a form looks but typically cannot change a forms function.
+-- A user with EditPerms of "Full" may completely customize his own forms but typically not anybody elses.
+-- A user with EditPerms of "Devel" will be able to customize forms System-Wide.
+
+select Username, UserDesc,  
+  'SuperUser'=
+  CASE 
+     WHEN [SuperUserFlag] = 0 THEN 'No'
+     WHEN [SuperUserFlag] = 1 THEN 'Yes'
+  END, 
+
+  'EditPerms' = 
+  CASE 
+     WHEN [EditLevel] = 0 THEN 'None'
+     WHEN [EditLevel] = 1 THEN 'Basic'
+     WHEN [EditLevel] = 2 THEN 'Full'
+     WHEN [EditLevel] = 3 Then 'Developer'
+   END,
+
+  'UserStatus'=
+   CASE 
+     WHEN [Status] = 0 THEN 'Active'
+     WHEN [Status] = 1 THEN 'Locked Out'
+     WHEN [Status] = 2 THEN 'Disabled'
+   END,
+         
+       CreateDate, PasswordExpirationDate
+from UserNames
+order by UserStatus asc;
+
+-- The "sa" account is a maintenance account.  It is not for general use and is limited to only one simultaneous login.
+-- The "service" "shoptrak" "barcode" and "ftautomation" accounts are internal services and are never used by people  
+Where Username not in ('sa', 'service', 'shoptrak', 'barcode', 'ftautomation')
+Order by Username

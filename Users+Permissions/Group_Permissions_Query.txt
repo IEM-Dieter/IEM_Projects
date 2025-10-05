@@ -1,0 +1,51 @@
+-- Group Permission to Forms (and / or objects) in SyteLine 
+-- Each Group can either allow or deny access to various forms with the following Yes/No Flags
+-- From the Groups form, you can display these same permissions by selecting one group at a time.
+-- The userflag=0 restricts this report to permissions to Groups only
+--  Delete Privilege      (Delete a Record)
+--  Edit Privilege        (Edit fields in an Existing Record as it is displayed)
+--  Execute Privilege     (Run a process -- like a stored procedure or record-changing functions)
+--  Insert Privilege      (Create a new Record)
+--  Read Privilege        (Display a record)
+--  Update Privilege      (Update a single record with a query or a process)
+--  Bulk Update Privilege (Massive record Updates from a query or a process)
+
+
+select Auth.SiteRef, GRPS.[GroupName], GRPS.[GroupDesc],  Auth.[ObjectName1] as [Form Name], ObjectType, ObjectName2 as SubName,  
+  case when Auth.[DeletePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Delete],
+       
+  case when Auth.[EditPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Edit],
+  
+  case when Auth.[ExecutePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Execute],
+
+  case when Auth.[InsertPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Insert],
+
+  case when Auth.[ReadPrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Read],
+
+  case when Auth.[UpdatePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Update],
+
+  case when Auth.[BulkUpdatePrivilege] = 1 
+     then 'Granted'
+     else 'Not Granted'
+  end as [Bulk_Update]
+
+from AccountAuthorizations_mst Auth inner join GroupNames GRPS on Auth.Id = GRPS.GroupId
+order by GroupName asc;
